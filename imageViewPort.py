@@ -9,7 +9,8 @@ class ImageViewport(QWidget):
         self.original_img = None
         self.resized_img = None
 
-    def set_image(self, image_path):
+
+    def set_image(self, image_path, grey_flag=False):
         """
         Set the image for the object.
 
@@ -25,9 +26,13 @@ class ImageViewport(QWidget):
 
             if image is None:
                 raise FileNotFoundError(f"Failed to load image: {image_path}")
+            
+            if not grey_flag:
+                # Convert BGR to RGB
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-            # Convert BGR to RGB
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            else:
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
             # Set the original_img attribute 
             self.original_img = image
@@ -39,40 +44,67 @@ class ImageViewport(QWidget):
         except Exception as e:
             logging.error(f"Error displaying image: {e}")
 
+
     def update_display(self):
+        """
+        Update the display if the original image is not None.
+        """
         if self.original_img is not None:
             self.repaint()
 
-    def paintEvent(self, event):
-        super().paintEvent(event)
 
+    def paintEvent(self, event):
         """
-        Override the paintEvent method to draw the resized image on the widget.
+        Override the paint event to draw the image on the widget.
+
+        Args:
+        - self: the widget
+        - event: the paint event
         """
+        super().paintEvent(event)
 
         if self.original_img is not None:
             painter_img = QPainter(self)
-            height, width, _ = self.original_img.shape
-            aspect_ratio = width / height
+            height, width = self.original_img.shape[:2]  # Get height and width
+
+            # Check if the image is grayscale or RGB
+            if len(self.original_img.shape) == 2:  # Grayscale image
+                image_format = QImage.Format.Format_Grayscale8
+                
+            else:  # RGB image
+                image_format = QImage.Format.Format_RGB888
+                
 
             # Resize the image while preserving aspect ratio
+            aspect_ratio = width / height
             target_width = min(self.width(), int(self.height() * aspect_ratio))
             target_height = min(self.height(), int(self.width() / aspect_ratio))
-            resized_img = cv2.resize(self.original_img, (target_width, target_height))
+            self.resized_img = cv2.resize(self.original_img, (target_width, target_height))
 
             # Calculate the position to center the image
             x_offset = (self.width() - target_width) // 2
             y_offset = (self.height() - target_height) // 2
 
             # Convert image to QImage
-            image = QImage(resized_img.data, resized_img.shape[1], resized_img.shape[0], resized_img.strides[0], QImage.Format.Format_RGB888)
+            image = QImage(self.resized_img.data, self.resized_img.shape[1], self.resized_img.shape[0],
+                        self.resized_img.strides[0], image_format)
 
             # Draw the image on the widget with the calculated offsets
-            pixmap = QPixmap.fromImage(image)
-            painter_img.drawPixmap(x_offset, y_offset, pixmap)
+            painter_img.drawImage(x_offset, y_offset, image)
 
 
     def clear(self):
+        """
+        This method sets the `original_img` attribute to None, effectively clearing the currently displayed image.
+        It then triggers an update of the display to reflect the change.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
+        print("Clearing image")
         self.original_img = None
-        self.resized_img = None
-        self.update_display()
+        self.repaint()
+
