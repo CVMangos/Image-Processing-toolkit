@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QVBoxLayout, QMessageBox, QFileDialog
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 import sys
-
+import pyqtgraph as pg
 # from cv2.linemod import Detector
 from Edge_Detector import EdgeDetector
 from imageViewPort import ImageViewport
@@ -12,6 +12,7 @@ from filterNoiseClass import FilterNoise
 from functools import partial
 from Thresholding import thresholding
 from Decoding import Decoding
+from Histogram import get_histograms
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -129,6 +130,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 # outport image will always be grayscale
             for output_port in self.out_ports:
                 output_port.set_image(image_path, grey_flag=True)
+
+        self.generate_hists_and_dists()
 
     def create_viewport(self, parent, viewport_class, mouse_double_click_event_handler=None):
         """
@@ -258,7 +261,15 @@ class MainWindow(QtWidgets.QMainWindow):
             print(f"Error decoding the image: {e}")
 
     def generate_hists_and_dists(self):
-        pass
+        self.original_img = self.input_ports[1].original_img.copy()
+        hists_and_dists = get_histograms(self.original_img)
+        self.ui.redDF_widget.plot(hists_and_dists['R'][0])
+        self.ui.redCDF_widget.plot(hists_and_dists['R'][1])
+        self.ui.greenDF_widget.plot(hists_and_dists['G'][0])
+        self.ui.greenCDF_widget.plot(hists_and_dists['G'][1])
+        self.ui.blueDF_widget.plot(hists_and_dists['B'][0])
+        self.ui.blueCDF_widget.plot(hists_and_dists['B'][1])
+
 
 def main():
     app = QtWidgets.QApplication([])
