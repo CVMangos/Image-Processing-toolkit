@@ -3,12 +3,13 @@ from PyQt6.QtGui import QPixmap, QImage, QPainter
 import logging
 import cv2
 
+
 class ImageViewport(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.original_img = None
         self.resized_img = None
-
+        self.image_path = None
 
     def set_image(self, image_path, grey_flag=False):
         """
@@ -19,6 +20,8 @@ class ImageViewport(QWidget):
 
         Returns:
             None
+            :param image_path:
+            :param grey_flag:
         """
         try:
             # Open the image file 
@@ -26,7 +29,8 @@ class ImageViewport(QWidget):
 
             if image is None:
                 raise FileNotFoundError(f"Failed to load image: {image_path}")
-            
+
+            self.image_path = image_path
             if not grey_flag:
                 # Convert BGR to RGB
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -44,14 +48,12 @@ class ImageViewport(QWidget):
         except Exception as e:
             logging.error(f"Error displaying image: {e}")
 
-
     def update_display(self):
         """
         Update the display if the original image is not None.
         """
         if self.original_img is not None:
             self.repaint()
-
 
     def paintEvent(self, event):
         """
@@ -70,10 +72,9 @@ class ImageViewport(QWidget):
             # Check if the image is grayscale or RGB
             if len(self.original_img.shape) == 2:  # Grayscale image
                 image_format = QImage.Format.Format_Grayscale8
-                
+
             else:  # RGB image
                 image_format = QImage.Format.Format_RGB888
-                
 
             # Resize the image while preserving aspect ratio
             aspect_ratio = width / height
@@ -87,11 +88,10 @@ class ImageViewport(QWidget):
 
             # Convert image to QImage
             image = QImage(self.resized_img.data, self.resized_img.shape[1], self.resized_img.shape[0],
-                        self.resized_img.strides[0], image_format)
+                           self.resized_img.strides[0], image_format)
 
             # Draw the image on the widget with the calculated offsets
             painter_img.drawImage(x_offset, y_offset, image)
-
 
     def clear(self):
         """
@@ -107,4 +107,5 @@ class ImageViewport(QWidget):
         print("Clearing image")
         self.original_img = None
         self.repaint()
+
 
