@@ -260,15 +260,37 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             print(f"Error decoding the image: {e}")
 
+
     def generate_hists_and_dists(self):
+        """
+        Generates histograms and distribution plots for the input image.
+        """
+        # Copy the original image
         self.original_img = self.input_ports[1].original_img.copy()
+        
+        # Compute histograms and distributions
         hists_and_dists = get_histograms(self.original_img)
-        self.ui.redDF_widget.plot(hists_and_dists['R'][0])
-        self.ui.redCDF_widget.plot(hists_and_dists['R'][1])
-        self.ui.greenDF_widget.plot(hists_and_dists['G'][0])
-        self.ui.greenCDF_widget.plot(hists_and_dists['G'][1])
-        self.ui.blueDF_widget.plot(hists_and_dists['B'][0])
-        self.ui.blueCDF_widget.plot(hists_and_dists['B'][1])
+
+        # Define plot widgets and corresponding data
+        plot_widgets = {
+            'redDF_widget': (hists_and_dists['R'][0], None, 'r'),
+            'greenDF_widget': (hists_and_dists['G'][0], None, 'g'),
+            'blueDF_widget': (hists_and_dists['B'][0], None, 'b'),
+            'redCDF_widget': (hists_and_dists['R'][1], (255, 0, 0, 100), 'r'),
+            'greenCDF_widget': (hists_and_dists['G'][1], (0, 255, 0, 100), 'g'),
+            'blueCDF_widget': (hists_and_dists['B'][1], (0, 0, 255, 100), 'b'),
+        }
+
+        # Plot each widget
+        for widget_name, (data, brush_color, pen_color) in plot_widgets.items():
+            # Set the background color to be transparent
+            getattr(self.ui, widget_name).setBackground(None)
+
+            # Plot data
+            plot_item = getattr(self.ui, widget_name).plot(data, pen=pen_color)
+            if brush_color is not None:
+                plot_item.setFillLevel(0)
+                plot_item.setBrush(pg.mkColor(brush_color))
 
 
 def main():
