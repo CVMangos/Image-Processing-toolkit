@@ -145,7 +145,7 @@ QTabBar::tab:!selected {
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="iconSize">
        <size>
@@ -1826,7 +1826,8 @@ QPushButton:pressed {
           <item>
            <widget class="PlotWidget" name="redDF_widget" native="true">
             <property name="styleSheet">
-             <string notr="true">	border: 4px solid #1f1c4e;</string>
+             <string notr="true">	border: 4px solid #1f1c4e;
+	padding: -2px 3px;</string>
             </property>
            </widget>
           </item>
@@ -1879,7 +1880,8 @@ QPushButton:pressed {
           <item>
            <widget class="PlotWidget" name="greenDF_widget" native="true">
             <property name="styleSheet">
-             <string notr="true">	border: 4px solid #1f1c4e;</string>
+             <string notr="true">	border: 4px solid #1f1c4e;
+	padding: -2px 3px;</string>
             </property>
            </widget>
           </item>
@@ -1932,7 +1934,8 @@ QPushButton:pressed {
           <item>
            <widget class="PlotWidget" name="blueDF_widget" native="true">
             <property name="styleSheet">
-             <string notr="true">	border: 4px solid #1f1c4e;</string>
+             <string notr="true">	border: 4px solid #1f1c4e;
+	padding: -2px 3px;</string>
             </property>
            </widget>
           </item>
@@ -1985,7 +1988,8 @@ QPushButton:pressed {
           <item>
            <widget class="PlotWidget" name="redCDF_widget" native="true">
             <property name="styleSheet">
-             <string notr="true">	border: 4px solid #1f1c4e;</string>
+             <string notr="true">	border: 4px solid #1f1c4e;
+	padding: -2px 3px;</string>
             </property>
            </widget>
           </item>
@@ -2038,7 +2042,8 @@ QPushButton:pressed {
           <item>
            <widget class="PlotWidget" name="greenCDF_widget" native="true">
             <property name="styleSheet">
-             <string notr="true">	border: 4px solid #1f1c4e;</string>
+             <string notr="true">	border: 4px solid #1f1c4e;
+	padding: -2px 3px;</string>
             </property>
            </widget>
           </item>
@@ -2091,7 +2096,8 @@ QPushButton:pressed {
           <item>
            <widget class="PlotWidget" name="blueCDF_widget" native="true">
             <property name="styleSheet">
-             <string notr="true">	border: 4px solid #1f1c4e;</string>
+             <string notr="true">	border: 4px solid #1f1c4e;
+	padding: -2px 3px;</string>
             </property>
            </widget>
           </item>
