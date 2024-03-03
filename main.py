@@ -124,12 +124,11 @@ class MainWindow(QtWidgets.QMainWindow):
             # Get the input port at the specified index
             input_port = self.input_ports[index]
             output_port = self.out_ports[index]
-
-            # Set the image for the input port
-            input_port.set_image(image_path)
-
-            # outport image will always be grayscale
-            output_port.set_image(image_path, grey_flag=True)
+            for input_port in self.input_ports:
+                input_port.set_image(image_path)
+                # outport image will always be grayscale
+            for output_port in self.out_ports:
+                output_port.set_image(image_path, grey_flag=True)
 
     def create_viewport(self, parent, viewport_class, mouse_double_click_event_handler=None):
         """
@@ -191,7 +190,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Apply median filter to the image and update the output port with the filtered image.
         """
-        output_port = self.out_ports[1]
+        self.original_img = cv2.cvtColor(self.input_ports[0].resized_img.copy(), cv2.COLOR_BGR2GRAY)
+        output_port = self.out_ports[0]
         img = output_port.resized_img
         if img is None or img.size == 0:
             print("Error: Empty or None image received.")
@@ -256,6 +256,9 @@ class MainWindow(QtWidgets.QMainWindow):
             output_port.update_display()
         except Exception as e:
             print(f"Error decoding the image: {e}")
+
+    def generate_hists_and_dists(self):
+        pass
 
 def main():
     app = QtWidgets.QApplication([])
