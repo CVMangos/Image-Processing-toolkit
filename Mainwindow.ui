@@ -1824,7 +1824,7 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="redDF_widget" native="true">
+           <widget class="PlotWidget" name="redDF_widget" native="true">
             <property name="styleSheet">
              <string notr="true">	border: 4px solid #1f1c4e;</string>
             </property>
@@ -1877,7 +1877,7 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="greenDF_widget" native="true">
+           <widget class="PlotWidget" name="greenDF_widget" native="true">
             <property name="styleSheet">
              <string notr="true">	border: 4px solid #1f1c4e;</string>
             </property>
@@ -1930,7 +1930,7 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="blueDF_widget" native="true">
+           <widget class="PlotWidget" name="blueDF_widget" native="true">
             <property name="styleSheet">
              <string notr="true">	border: 4px solid #1f1c4e;</string>
             </property>
@@ -1983,7 +1983,7 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="redCDF_widget" native="true">
+           <widget class="PlotWidget" name="redCDF_widget" native="true">
             <property name="styleSheet">
              <string notr="true">	border: 4px solid #1f1c4e;</string>
             </property>
@@ -2036,7 +2036,7 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="greenCDF_widget" native="true">
+           <widget class="PlotWidget" name="greenCDF_widget" native="true">
             <property name="styleSheet">
              <string notr="true">	border: 4px solid #1f1c4e;</string>
             </property>
@@ -2089,7 +2089,7 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="blueCDF_widget" native="true">
+           <widget class="PlotWidget" name="blueCDF_widget" native="true">
             <property name="styleSheet">
              <string notr="true">	border: 4px solid #1f1c4e;</string>
             </property>
@@ -3511,6 +3511,14 @@ background-color: rgb(31, 28, 78);</string>
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>
