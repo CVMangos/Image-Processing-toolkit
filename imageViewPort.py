@@ -93,7 +93,6 @@ class ImageViewport(QWidget):
             # Draw the image on the widget with the calculated offsets
             painter_img.drawImage(x_offset, y_offset, image)
 
-
     def clear(self):
         """
         This method sets the `original_img` attribute to None, effectively clearing the currently displayed image.

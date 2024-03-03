@@ -19,7 +19,6 @@ class Decoding:
         equalized_image = np.interp(self.gray.flatten(), range(256), cdf_normalized).reshape(self.gray.shape).astype(np.uint8)
         return equalized_image
 
-
     def normalize(self):
         # Convert the image to floating-point format
         image_float = self.gray.astype(np.float32)

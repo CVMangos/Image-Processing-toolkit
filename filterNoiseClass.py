@@ -4,7 +4,7 @@ import cv2
 ##################################################################################
 # Basic implementation, will be contuined tomorrow 
 ##################################################################################
-class Filter:
+class FilterNoise:
     def __init__(self, original_img):
         self.original_img = original_img
         self.filtered_img = None
