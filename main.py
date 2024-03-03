@@ -119,17 +119,17 @@ class MainWindow(QtWidgets.QMainWindow):
             index: The index of the ImageViewport to set the image for.
         """
         file_filter = "Raw Data (*.png *.jpg *.jpeg *.jfif)"
-        image_path, _ = QFileDialog.getOpenFileName(self, 'Open Image File', './', filter=file_filter)
+        self.image_path, _ = QFileDialog.getOpenFileName(self, 'Open Image File', './', filter=file_filter)
 
-        if image_path and 0 <= index < len(self.input_ports):
+        if self.image_path and 0 <= index < len(self.input_ports):
             # Get the input port at the specified index
             input_port = self.input_ports[index]
             output_port = self.out_ports[index]
             for input_port in self.input_ports:
-                input_port.set_image(image_path)
+                input_port.set_image(self.image_path)
                 # outport image will always be grayscale
             for output_port in self.out_ports:
-                output_port.set_image(image_path, grey_flag=True)
+                output_port.set_image(self.image_path, grey_flag=True)
 
         self.generate_hists_and_dists()
 
@@ -187,7 +187,8 @@ class MainWindow(QtWidgets.QMainWindow):
             event: The event triggering the image clearing.
             index (int): The index of the image to be cleared in the input_ports list.
         """
-        self.input_ports[index].reset()
+        self.input_ports[index].set_image(self.image_path)
+        self.out_ports[index].set_image(self.image_path, grey_flag=True)
 
     def apply_filter(self, filter_type):
         """
@@ -280,6 +281,10 @@ class MainWindow(QtWidgets.QMainWindow):
             'greenCDF_widget': (hists_and_dists['G'][1], (0, 255, 0, 100), 'g'),
             'blueCDF_widget': (hists_and_dists['B'][1], (0, 0, 255, 100), 'b'),
         }
+
+        # Clear existing plot items
+        for widget_name in plot_widgets.keys():
+            getattr(self.ui, widget_name).clear()
 
         # Plot each widget
         for widget_name, (data, brush_color, pen_color) in plot_widgets.items():
