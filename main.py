@@ -10,7 +10,8 @@ from Edge_Detector import EdgeDetector
 from imageViewPort import ImageViewport
 from filterNoiseClass import FilterNoise
 from functools import partial
-
+from Thresholding import thresholding
+from Decoding import Decoding
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -44,6 +45,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.robertsEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="roberts_detector"))
         self.ui.cannyEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="canny_detector"))
         self.ui.prewittEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="prewitt_detector"))
+        self.ui.localThreshold.clicked.connect(partial(self.apply_threshold, threshold_type="local_thresholding"))
+        self.ui.globalThreshold.clicked.connect(partial(self.apply_threshold, threshold_type="global_thresholding"))
+        self.ui.equalizeButoon.clicked.connect(partial(self.decode, decode_type="equalize"))
+        self.ui.normalizeButton.clicked.connect(partial(self.decode, decode_type="normalize"))
 
     def load_ui_elements(self):
         """
@@ -218,6 +223,39 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             print(f"Error Detecting edges: {e}")
 
+    def apply_threshold(self, threshold_type):
+        self.original_img = cv2.cvtColor(self.input_ports[2].resized_img.copy(), cv2.COLOR_BGR2GRAY)
+        output_port = self.out_ports[2]
+        img = self.original_img
+        if img is None or img.size == 0:
+            print("Error: Empty or None image received.")
+            return
+
+        threshold_ = thresholding(img)
+        try:
+            threshold = getattr(threshold_, threshold_type)
+            thresholded_img = threshold()
+            output_port.original_img = thresholded_img
+            output_port.update_display()
+        except Exception as e:
+            print(f"Error Thresholding the image: {e}")
+
+    def decode(self, decode_type):
+        self.original_img = cv2.cvtColor(self.input_ports[2].resized_img.copy(), cv2.COLOR_BGR2GRAY)
+        output_port = self.out_ports[2]
+        img = self.original_img
+        if img is None or img.size == 0:
+            print("Error: Empty or None image received.")
+            return
+
+        decoder = Decoding(img)
+        try:
+            decode = getattr(decoder, decode_type)
+            decoded_img = decode()
+            output_port.original_img = decoded_img
+            output_port.update_display()
+        except Exception as e:
+            print(f"Error decoding the image: {e}")
 
 def main():
     app = QtWidgets.QApplication([])
