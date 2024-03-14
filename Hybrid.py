@@ -17,3 +17,7 @@ class Hybrid:
         filtered.gaussian_filter(freq_response)   
         self.filtered_img_two = filtered.original_img - filtered.filtered_img
         return self.filtered_img_two
+
+    def generate_hybrid(self):
+        # Combine low-pass and high-pass images
+        return self.filtered_img_one + self.filtered_img_two

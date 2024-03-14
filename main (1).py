@@ -29,7 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.original_img = None
         self.kernal_size = None
         self.hybrid = Hybrid()
-        self.image_paths = [None for _ in range(5)]
+        self.image_paths = [None for _ in range(6)]
         self.init_ui()
 
 
@@ -58,6 +58,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.gaussianNoise.clicked.connect(partial(self.apply_filter_noise, action_type="gaussian_noise", class_name=Noise))
         self.ui.hybridSlider1.valueChanged.connect(partial(self.apply_changes, class_type= Hybrid, action_type= "None", index=3))
         self.ui.hybridSlider2.valueChanged.connect(partial(self.apply_changes, class_type= Hybrid, action_type= "None", index=4))
+        self.ui.hybridButton.clicked.connect(partial(self.apply_changes, class_type= Hybrid, action_type= "generate_hybrid", index=5))
         self.ui.comboBox_1.currentIndexChanged.connect(partial(self.onComboBoxChanged, isFirst = True))
         self.ui.comboBox_2.currentIndexChanged.connect(partial(self.onComboBoxChanged, isFirst = False))
         # self.ui.sobelEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="sobel_detector"))
@@ -82,7 +83,7 @@ class MainWindow(QtWidgets.QMainWindow):
                               self.ui.thresholdInput, self.ui.hybridIntput1, self.ui.hybridIntput2]
 
         self.ui_out_ports = [self.ui.filterOutput, self.ui.edgeOutput,
-                             self.ui.thresholdOutput, self.ui.hybridOutput1, self.ui.hybridOutput2]
+                             self.ui.thresholdOutput, self.ui.hybridOutput1, self.ui.hybridOutput2, self.ui.hybridOutput]
 
         # Create image viewports for input ports and bind browse_image function to the event
         self.input_ports.extend([
@@ -91,7 +92,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Create image viewports for output ports
         self.out_ports.extend(
-            [self.create_image_viewport(self.ui_out_ports[i], mouse_double_click_event_handler=None) for i in range(5)])
+            [self.create_image_viewport(self.ui_out_ports[i], mouse_double_click_event_handler=None) for i in range(6)])
 
         # Initialize import buttons
         self.import_buttons = [self.ui.importButton, self.ui.importButton_2,
@@ -186,7 +187,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Check if the image path is valid and the index is within the range of input ports
         if image_path and 0 <= index < len(self.input_ports):
             # Check if the index is for the hybrid tab
-            if index == 4 or index == 3:
+            if index > 2:
                 # Set the image for the last hybrid viewport
                 input_port = self.input_ports[index]
                 output_port = self.out_ports[index]
@@ -250,7 +251,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Args:
             index (int): The index of the port to clear.
         """
-        for _, (input_port, output_port) in enumerate(zip(self.input_ports[:-1], self.out_ports[:-1])):
+        for _, (input_port, output_port) in enumerate(zip(self.input_ports[:3], self.out_ports[:3])):
             input_port.clear()  # Clear the input port
             output_port.clear()  # Clear the output port
         self.clear_histographs()  # Clear the histographs
@@ -295,7 +296,7 @@ class MainWindow(QtWidgets.QMainWindow):
         img = output_port.resized_img
 
         # Check if the image is empty or None
-        if img is None or img.size == 0:
+        if (img is None or img.size == 0) and index != 5:
             print("Error: Empty or None image received.")
             return
 
@@ -306,15 +307,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 action = self.hybrid
                 action_method = getattr(action, action_type)
                 processed_image = action_method(img , self.ui.hybridSlider1.value())
-                self.hybrid.filtered_img_one = processed_image
             elif index == 4:
                 action_type = "low_pass" if self.ui.comboBox_2.currentIndex() == 0 else "high_pass"
                 action = self.hybrid
                 action_method = getattr(action, action_type)
                 processed_image = action_method(img, self.ui.hybridSlider2.value())
-                self.hybrid.filtered_img_two = processed_image
             else:
-                action = class_type(img)
+                action = class_type(img) if index < 5 else self.hybrid
                 action_method = getattr(action, action_type)
                 processed_image = action_method()
 
