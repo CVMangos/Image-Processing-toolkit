@@ -7,6 +7,7 @@ import pyqtgraph as pg
 from functools import partial
 from Filters import Filter
 from Noise import Noise
+from Hybrid import Hybrid
 from Edge_Detector import EdgeDetector
 from imageViewPort import ImageViewport
 from Thresholding import thresholding
@@ -27,6 +28,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = None
         self.original_img = None
         self.kernal_size = None
+        self.hybrid = Hybrid()
+        self.image_paths = [None for _ in range(5)]
         self.init_ui()
 
 
@@ -45,6 +48,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.load_ui_elements()
         self.connect_to_UI()
         self.ui.kernalSize_3.setChecked(True)
+        self.ui.comboBox_2.setCurrentIndex(1)
         self.kernal_size = self.get_kernal_size()
         self.ui.medianFilter.clicked.connect(partial(self.apply_filter_noise, action_type="median_filter", class_name=Filter))
         self.ui.averageFilter.clicked.connect(partial(self.apply_filter_noise, action_type="average_filter", class_name=Filter))
@@ -52,6 +56,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.saltPepperNoise.clicked.connect(partial(self.apply_filter_noise, action_type="slat_and_pepper", class_name=Noise))
         self.ui.uniformNoise.clicked.connect(partial(self.apply_filter_noise, action_type="uniform_noise", class_name=Noise))
         self.ui.gaussianNoise.clicked.connect(partial(self.apply_filter_noise, action_type="gaussian_noise", class_name=Noise))
+        self.ui.hybridSlider1.valueChanged.connect(partial(self.apply_changes, class_type= Hybrid, action_type= "None", index=3))
+        self.ui.hybridSlider2.valueChanged.connect(partial(self.apply_changes, class_type= Hybrid, action_type= "None", index=4))
+        self.ui.comboBox_1.currentIndexChanged.connect(partial(self.onComboBoxChanged, isFirst = True))
+        self.ui.comboBox_2.currentIndexChanged.connect(partial(self.onComboBoxChanged, isFirst = False))
         # self.ui.sobelEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="sobel_detector"))
         # self.ui.robertsEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="roberts_detector"))
         # self.ui.cannyEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="canny_detector"))
@@ -105,6 +113,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Bind reset_image function to reset buttons
         self.bind_buttons(self.reset_buttons, self.reset_image)
+
+        # Set range for frequency response of images
+        self.ui.hybridSlider1.setRange(0, 255)
+        self.ui.hybridSlider2.setRange(0, 255)
 
     def bind_buttons(self, buttons, function):
         """
@@ -168,22 +180,27 @@ class MainWindow(QtWidgets.QMainWindow):
         file_filter = "Raw Data (*.png *.jpg *.jpeg *.jfif)"
 
         # Open a file dialog to select an image file
-        self.image_path, _ = QFileDialog.getOpenFileName(self, 'Open Image File', './', filter=file_filter)
+        image_path, _ = QFileDialog.getOpenFileName(self, 'Open Image File', './', filter=file_filter)
+        self.image_paths[index] = image_path
 
         # Check if the image path is valid and the index is within the range of input ports
-        if self.image_path and 0 <= index < len(self.input_ports):
-            # Check if the index is for the last viewport in the hybrid tab
-            if index == 4:
+        if image_path and 0 <= index < len(self.input_ports):
+            # Check if the index is for the hybrid tab
+            if index == 4 or index == 3:
                 # Set the image for the last hybrid viewport
                 input_port = self.input_ports[index]
                 output_port = self.out_ports[index]
-                input_port.set_image(self.image_path)
-                output_port.set_image(self.image_path, grey_flag=True)
+                input_port.set_image(image_path)
+                output_port.set_image(image_path, grey_flag=True)
+                if index == 3:
+                    self.apply_changes(class_type= Hybrid, action_type= "low_pass" if self.ui.comboBox_1.currentIndex() == 0 else "high_pass", index=index)
+                elif index == 4:
+                    self.apply_changes(class_type= Hybrid, action_type= "low_pass" if self.ui.comboBox_2.currentIndex() == 0 else "high_pass", index=index)
             # Show the image on all viewports except the last hybrid viewport
             else:
-                for idx, (input_port, output_port) in enumerate(zip(self.input_ports[:-1], self.out_ports[:-1])):
-                    input_port.set_image(self.image_path)
-                    output_port.set_image(self.image_path, grey_flag=True)
+                for idx, (input_port, output_port) in enumerate(zip(self.input_ports[:3], self.out_ports[:3])):
+                    input_port.set_image(image_path)
+                    output_port.set_image(image_path, grey_flag=True)
 
         # Generate histograms and distributions
         self.generate_hists_and_dists()
@@ -247,8 +264,9 @@ class MainWindow(QtWidgets.QMainWindow):
             event: The event triggering the image clearing.
             index (int): The index of the image to be cleared in the input_ports list.
         """
-        self.input_ports[index].set_image(self.image_path)
-        self.out_ports[index].set_image(self.image_path, grey_flag=True)
+        if(self.image_paths[index] != None):
+            self.input_ports[index].set_image(self.image_paths[index])
+            self.out_ports[index].set_image(self.image_paths[index], grey_flag=True)
 
 
 ###################################################################################
@@ -282,10 +300,23 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
         # Create an instance of the specified class type and apply the action
-        action = class_type(img)
-        try:
-            action_method = getattr(action, action_type)
-            processed_image = action_method()
+        try: 
+            if index == 3:
+                action_type = "low_pass" if self.ui.comboBox_1.currentIndex() == 0 else "high_pass"
+                action = self.hybrid
+                action_method = getattr(action, action_type)
+                processed_image = action_method(img , self.ui.hybridSlider1.value())
+                self.hybrid.filtered_img_one = processed_image
+            elif index == 4:
+                action_type = "low_pass" if self.ui.comboBox_2.currentIndex() == 0 else "high_pass"
+                action = self.hybrid
+                action_method = getattr(action, action_type)
+                processed_image = action_method(img, self.ui.hybridSlider2.value())
+                self.hybrid.filtered_img_two = processed_image
+            else:
+                action = class_type(img)
+                action_method = getattr(action, action_type)
+                processed_image = action_method()
 
             # Update the original image in the output port and update the display
             output_port.original_img = processed_image
@@ -424,6 +455,15 @@ class MainWindow(QtWidgets.QMainWindow):
         for df_widget, cdf_widget in zip(self.df_widgets.keys(), self.cdf_widgets.keys()):
             getattr(self.ui, df_widget).clear()
             getattr(self.ui, cdf_widget).clear()
+
+    # Change between low pass and high pass filters in Hybrid
+    def onComboBoxChanged(self, isFirst: bool):
+        if isFirst:
+            self.ui.comboBox_2.setCurrentIndex(1 if self.ui.comboBox_1.currentIndex() == 0 else 0)
+        else: 
+            self.ui.comboBox_1.setCurrentIndex(1 if self.ui.comboBox_2.currentIndex() == 0 else 0)   
+        self.apply_changes(class_type= Hybrid, action_type= "low_pass" if self.ui.comboBox_1.currentIndex() == 0 else "high_pass", index=3)     
+        self.apply_changes(class_type= Hybrid, action_type= "low_pass" if self.ui.comboBox_2.currentIndex() == 0 else "high_pass", index=4)     
 
 
 def main():

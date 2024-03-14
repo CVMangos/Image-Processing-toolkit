@@ -43,12 +43,13 @@ class Filter:
         self.filtered_img = data_final
         return self.filtered_img
 
-    def gaussian_filter(self):
+    def gaussian_filter(self, frequency_response = 255):
         """
         Apply Gaussian filter to the original image.
         """
         sigma = 1
         kernel = self._gaussian_kernel(self.kernel_size, sigma)
+        kernel *= frequency_response / 255
 
         self.filtered_img = self._apply_filter(kernel)
 
