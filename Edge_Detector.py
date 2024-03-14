@@ -4,8 +4,7 @@ import numpy as np
 
 class EdgeDetector:
     def __init__(self, original_img):
-        self.gray = original_img
-        self.gray = cv2.convertScaleAbs(self.gray)
+        self.gray = cv2.convertScaleAbs(original_img)
 
     def sobel_detector(self):
         # Define Sobel kernels
