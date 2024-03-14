@@ -17,11 +17,11 @@ class EdgeDetector:
                             [1, 2, 1]])
 
         # Convolve the image with the kernels
-        gradient_x = cv2.filter2D(self.gray, -1, sobel_x)
-        gradient_y = cv2.filter2D(self.gray, -1, sobel_y)
+        gradient_x = cv2.filter2D(self.gray, cv2.CV_64F, sobel_x)
+        gradient_y = cv2.filter2D(self.gray, cv2.CV_64F, sobel_y)
 
         # Compute gradient magnitude
-        gradient_magnitude = np.sqrt(gradient_x ** 2 + gradient_y ** 2)
+        gradient_magnitude = cv2.sqrt(cv2.pow(gradient_x, 2), cv2.pow(gradient_y, 2))
 
         gradient_magnitude *= 255.0 / gradient_magnitude.max()
 
@@ -31,9 +31,9 @@ class EdgeDetector:
         kernel_x = np.array([[1, 0], [0, -1]])
         kernel_y = np.array([[0, 1], [-1, 0]])
 
-        roberts_x = cv2.filter2D(self.gray, -1, kernel_x)
-        roberts_y = cv2.filter2D(self.gray, -1, kernel_y)
-        roberts = np.sqrt(roberts_x ** 2 + roberts_y ** 2)
+        roberts_x = cv2.filter2D(self.gray, cv2.CV_64F, kernel_x)
+        roberts_y = cv2.filter2D(self.gray, cv2.CV_64F, kernel_y)
+        roberts = cv2.sqrt(cv2.pow(roberts_x, 2), cv2.pow(roberts_y, 2))
 
         return roberts.astype(np.uint8)
 
@@ -42,10 +42,11 @@ class EdgeDetector:
         blurred_image = cv2.GaussianBlur(self.gray, (5, 5), 0)
         low_threshold = 5
         high_threshold = 20
+
         # Step 3: Compute gradient magnitude and direction
         gradient_x = cv2.Sobel(blurred_image, cv2.CV_64F, 1, 0, ksize=3)
         gradient_y = cv2.Sobel(blurred_image, cv2.CV_64F, 0, 1, ksize=3)
-        gradient_magnitude = np.sqrt(gradient_x ** 2 + gradient_y ** 2)
+        gradient_magnitude = cv2.sqrt(cv2.pow(gradient_x, 2), cv2.pow(gradient_y, 2))
         gradient_direction = np.arctan2(gradient_y, gradient_x) * (180 / np.pi)
 
         # Step 4: Non-maximum suppression
@@ -86,8 +87,8 @@ class EdgeDetector:
     def prewitt_detector(self):
         kernel_x = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
         kernel_y = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
-        prewitt_x = cv2.filter2D(self.gray, -1, kernel_x)
-        prewitt_y = cv2.filter2D(self.gray, -1, kernel_y)
-        prewitt = np.sqrt(prewitt_x ** 2 + prewitt_y ** 2)
+        prewitt_x = cv2.filter2D(self.gray, cv2.CV_64F, kernel_x)
+        prewitt_y = cv2.filter2D(self.gray, cv2.CV_64F, kernel_y)
+        prewitt = cv2.sqrt(cv2.pow(prewitt_x, 2), cv2.pow(prewitt_y, 2))
 
         return prewitt.astype(np.uint8)
