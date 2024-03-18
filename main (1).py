@@ -61,14 +61,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.hybridButton.clicked.connect(partial(self.apply_changes, class_type= Hybrid, action_type= "generate_hybrid", index=5))
         self.ui.comboBox_1.currentIndexChanged.connect(partial(self.onComboBoxChanged, isFirst = True))
         self.ui.comboBox_2.currentIndexChanged.connect(partial(self.onComboBoxChanged, isFirst = False))
-        # self.ui.sobelEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="sobel_detector"))
-        # self.ui.robertsEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="roberts_detector"))
-        # self.ui.cannyEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="canny_detector"))
-        # self.ui.prewittEdge.clicked.connect(partial(self.apply_edge_detector, detector_type="prewitt_detector"))
-        # self.ui.localThreshold.clicked.connect(partial(self.apply_threshold, threshold_type="local_thresholding"))
-        # self.ui.globalThreshold.clicked.connect(partial(self.apply_threshold, threshold_type="global_thresholding"))
-        # self.ui.equalizeButoon.clicked.connect(partial(self.decode, decode_type="equalize"))
-        # self.ui.normalizeButton.clicked.connect(partial(self.decode, decode_type="normalize"))
 
     def load_ui_elements(self):
         """
@@ -139,9 +131,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def connect_to_UI(self):
         connects = {
-            # self.ui.medianFilter: (Filter, "median_filter", 0),
-            # self.ui.averageFilter: (Filter, "average_filter", 0),
-            # self.ui.gaussianFilter: (Filter, "gaussian_filter", 0),
             self.ui.sobelEdge: (EdgeDetector, "sobel_detector", 1),
             self.ui.robertsEdge: (EdgeDetector, "roberts_detector", 1),
             self.ui.cannyEdge: (EdgeDetector, "canny_detector", 1),
@@ -204,7 +193,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     output_port.set_image(image_path, grey_flag=True)
 
         # Generate histograms and distributions
-        self.generate_hists_and_dists()
+        self.generate_hists_and_dists(index)
 
 
     def create_viewport(self, parent, viewport_class, mouse_double_click_event_handler=None):
@@ -348,64 +337,14 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             print(f"Error applying median filter: {e}")
 
-    # def apply_edge_detector(self, detector_type):
-    #     self.original_img = cv2.cvtColor(self.input_ports[1].resized_img.copy(), cv2.COLOR_BGR2GRAY)
-    #     output_port = self.out_ports[1]
-    #     img = self.original_img
-    #     if img is None or img.size == 0:
-    #         print("Error: Empty or None image received.")
-    #         return
 
-    #     detector = EdgeDetector(img)
-    #     try:
-    #         detect = getattr(detector, detector_type)
-    #         detected_edges = detect()
-    #         output_port.original_img = detected_edges
-    #         output_port.update_display()
-    #     except Exception as e:
-    #         print(f"Error Detecting edges: {e}")
-
-    # def apply_threshold(self, threshold_type):
-    #     self.original_img = cv2.cvtColor(self.input_ports[2].resized_img.copy(), cv2.COLOR_BGR2GRAY)
-    #     output_port = self.out_ports[2]
-    #     img = self.original_img
-    #     if img is None or img.size == 0:
-    #         print("Error: Empty or None image received.")
-    #         return
-
-    #     threshold_ = thresholding(img)
-    #     try:
-    #         threshold = getattr(threshold_, threshold_type)
-    #         thresholded_img = threshold()
-    #         output_port.original_img = thresholded_img
-    #         output_port.update_display()
-    #     except Exception as e:
-    #         print(f"Error Thresholding the image: {e}")
-
-    # def decode(self, decode_type):
-    #     self.original_img = cv2.cvtColor(self.input_ports[2].resized_img.copy(), cv2.COLOR_BGR2GRAY)
-    #     output_port = self.out_ports[2]
-    #     img = self.original_img
-    #     if img is None or img.size == 0:
-    #         print("Error: Empty or None image received.")
-    #         return
-
-    #     decoder = Decoding(img)
-    #     try:
-    #         decode = getattr(decoder, decode_type)
-    #         decoded_img = decode()
-    #         output_port.original_img = decoded_img
-    #         output_port.update_display()
-    #     except Exception as e:
-    #         print(f"Error decoding the image: {e}")
-
-
-    def generate_hists_and_dists(self):
+    def generate_hists_and_dists(self, index):
         """
         Generates histograms and distribution plots for the input image.
         """
         # Copy the original image
-        self.original_img = self.input_ports[1].original_img.copy()
+        
+        self.original_img = self.input_ports[index].original_img
         
         # Compute histograms and distributions
         hists_and_dists = get_histograms(self.original_img)
@@ -454,6 +393,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for df_widget, cdf_widget in zip(self.df_widgets.keys(), self.cdf_widgets.keys()):
             getattr(self.ui, df_widget).clear()
             getattr(self.ui, cdf_widget).clear()
+
 
     # Change between low pass and high pass filters in Hybrid
     def onComboBoxChanged(self, isFirst: bool):

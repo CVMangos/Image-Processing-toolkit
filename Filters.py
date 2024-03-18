@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 class Filter:
     def __init__(self, original_img, kernel_size):
@@ -51,7 +52,7 @@ class Filter:
         kernel = self._gaussian_kernel(self.kernel_size, sigma)
         kernel *= frequency_response / 255
 
-        self.filtered_img = self._apply_filter(kernel)
+        self.filtered_img = cv2.filter2D(self.original_img, -1, kernel)
 
         return self.filtered_img
 
@@ -61,7 +62,8 @@ class Filter:
         """
         kernel = np.ones((self.kernel_size, self.kernel_size)) / (self.kernel_size ** 2)
 
-        self.filtered_img = self._apply_filter(kernel)
+        # Apply average filter using cv2.filter2D()
+        self.filtered_img = cv2.filter2D(self.original_img, -1, kernel)
 
         return self.filtered_img
 
@@ -73,20 +75,3 @@ class Filter:
             -(x - size // 2) ** 2 / (2 * sigma ** 2) - (y - size // 2) ** 2 / (2 * sigma ** 2)), (size, size))
         kernel /= np.sum(kernel)
         return kernel
-
-    def _apply_filter(self, kernel):
-        """
-        Apply a given kernel filter to the original image.
-        """
-        pad_width = self.kernel_size // 2
-        padded_img = np.pad(self.original_img, pad_width, mode='constant')
-
-        filtered_img = np.zeros_like(self.original_img)
-
-        for i in range(pad_width, padded_img.shape[0] - pad_width):
-            for j in range(pad_width, padded_img.shape[1] - pad_width):
-                neighbors = padded_img[i - pad_width:i + pad_width + 1, j - pad_width:j + pad_width + 1]
-                filtered_value = np.sum(neighbors * kernel)
-                filtered_img[i - pad_width, j - pad_width] = filtered_value
-
-        return filtered_img
