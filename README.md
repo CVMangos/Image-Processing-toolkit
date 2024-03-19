@@ -1,40 +1,45 @@
-# Signal Processing and Sampling Application
+# Image Processing Toolbox
 
 ## Overview
 
-This Python application is designed for signal processing and analysis. It provides a graphical user interface (GUI) built with PyQt6 and utilizes various signal processing techniques and features. Users can load, process, and analyze signal data from different sources, as well as manipulate and visualize signals with components. The application includes features for handling noise, signal reconstruction, and more.
+The Image Processing Toolbox is a comprehensive toolkit for various image processing tasks, including filtering, noise generation, edge detection, histogram manipulation, and hybrid image generation.
 
 ## Features
 
-### Main Window Class
+### Filter Class
+Apply different types of filters such as median, Gaussian, and average filters to remove noise and enhance image quality.
 
-The core of the application is represented by the `MainWindow` class, which extends `QtWidgets.QMainWindow`. This class serves as the main user interface for the application.
+### Noise Class
+Add different types of noise like salt and pepper noise, Gaussian noise, and uniform noise to simulate real-world scenarios and test algorithms.
 
-### Signal Management
+### EdgeDetector Class
+Implement various edge detection algorithms including Sobel, Roberts, Canny, and Prewitt for identifying edges and boundaries within an image.
 
-- **Loading Signals**: Users can load signal data from various file types, including CSV and WAV files. The application can read and parse the data, making it available for further analysis.
+### Decoding Class
+Perform histogram equalization and image normalization to improve contrast and appearance, facilitating better analysis and interpretation.
 
-- **Adding Components**: Signals can be composed of multiple components, which users can add and configure. Components include frequency, amplitude, and phase parameters.
+### Thresholding Class
+Segment images into regions of interest using global and local thresholding algorithms, crucial for tasks like image segmentation.
 
-- **Signal Generation**: The application allows users to generate mixed signals by specifying and combining components. It supports the generation of signals with added noise based on signal-to-noise ratio (SNR).
+### Hybrid Class
+Create hybrid images by blending low-pass and high-pass filtered images to produce visually interesting effects.
 
-- **Signal Visualization**: Loaded signals and generated mixed signals are plotted for visualization. Users can select and analyze specific signals using the GUI.
+## User Interface (UI) Details
 
-### Signal Processing
+The UI of the Image Processing Toolbox provides an intuitive interface for users to interact with the various image processing functionalities. Here are some key components and functionalities of the UI:
 
-- **Signal Sampling**: Users can adjust the sampling rate, either based on the actual signal frequency or by specifying a custom rate. The application provides options for subsampling and signal reconstruction.
+- **Main Window:** The main window of the application displays the toolbox's title and icon, providing easy access to the image processing tools.
 
-- **Signal Reconstruction**: The application supports signal reconstruction using sinc interpolation, allowing users to see the effects of subsampling on the signal.
+- **Tool Selection:** Users can select different image processing tools, such as filters, noise generation, edge detection, histogram manipulation, and hybrid image generation, using tabs or dropdown menus.
 
-- **Signal Error Analysis**: Users can visualize the difference between the original and reconstructed signals to analyze the quality of the reconstruction.
+- **Image Input:** Users can browse and select input images using file dialogs. The selected images are displayed in input viewports for visualization and processing.
 
-- **Noise Handling**: Noise can be added to signals based on the specified SNR. The application calculates and adds noise to the signal data, allowing users to observe the impact on signal quality.
+- **Image Output:** Processed images are displayed in output viewports, allowing users to compare the results with the original images.
 
-### User Interface
+- **Interactive Controls:** Interactive controls, such as buttons, sliders, and combo boxes, are provided for applying different image processing operations, changing parameter settings, and generating hybrid images.
 
-- **Graphical Visualization**: Signals, reconstructed signals, and error plots are displayed in graphical form using PyQtGraph.
+- **Histogram Visualization:** Histograms and distribution plots of input images are displayed for visual analysis and comparison. Users can observe changes in image characteristics after applying certain operations.
 
-- **Interactive Elements**: Users can interact with the GUI through buttons, sliders, and radio buttons to control various aspects of signal processing and visualization.
 
 ## Getting Started
 
@@ -49,33 +54,3 @@ The core of the application is represented by the `MainWindow` class, which exte
    ```bash
    python main.py
    ```
-
-## Contributors <a name = "Contributors"></a>
-<table>
-  <tr>
-    <td align="center">
-    <a href="https://github.com/MohamedMandour10" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/115044826?v=4" width="150px;" alt="Mohamed Elsayed Eid"/>
-    <br />
-    <sub><b>Mohamed Elsayed Eid</b></sub></a>
-    </td>
-    <td align="center">
-    <a href="https://github.com/mohamedmosilhy" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/93820559?v=4" width="150px;" alt="mohamed mosilhy"/>
-    <br />
-    <sub><b>Mohamed Mosilhy</b></sub></a>
-    </td>
-    <td align="center">
-    <a href="https://github.com/MahmoudMagdy404" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/83336074?v=4" width="150px;" alt="Mahmoud Magdy"/>
-    <br />
-    <sub><b>Mahmoud Magdy</b></sub></a>
-    </td>
-    <td align="center">
-    <a href="https://github.com/joyou159" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/85418161?v=4" width="150px;" alt="Youssef Ahmed"/>
-    <br />
-    <sub><b>Youssef Ahmed</b></sub></a>
-    </td>
-      </tr>
-
