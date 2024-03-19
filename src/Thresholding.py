@@ -5,7 +5,7 @@ import cv2
 class thresholding:
     def __init__(self, original_img):
         self.gray = cv2.convertScaleAbs(original_img)
-        self.threshold = 127
+        self.threshold = 120
         self.block_size = 11
 
     def global_thresholding(self):

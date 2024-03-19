@@ -1,5 +1,5 @@
 import numpy as np
-from Filters import Filter
+from src.Filters import Filter
 import cv2
 from numpy.fft import fft2, ifft2, fftshift, ifftshift
 
