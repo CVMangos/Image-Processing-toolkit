@@ -276,7 +276,8 @@ class MainWindow(QtWidgets.QMainWindow):
         None
         """
         # Reset the image at the specified index
-        self.reset_image(index)
+        if index < 3:
+            self.reset_image(index)
 
         # Obtain the output port for the specified index
         output_port = self.out_ports[index]
@@ -292,15 +293,17 @@ class MainWindow(QtWidgets.QMainWindow):
         # Create an instance of the specified class type and apply the action
         try: 
             if index == 3:
+                input_image = self.input_ports[index].resized_img
                 action_type = "low_pass" if self.ui.comboBox_1.currentIndex() == 0 else "high_pass"
                 action = self.hybrid
                 action_method = getattr(action, action_type)
-                processed_image = action_method(img , self.ui.hybridSlider1.value())
+                processed_image = action_method(cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY), self.ui.hybridSlider1.value())
             elif index == 4:
+                input_image = self.input_ports[index].resized_img
                 action_type = "low_pass" if self.ui.comboBox_2.currentIndex() == 0 else "high_pass"
                 action = self.hybrid
                 action_method = getattr(action, action_type)
-                processed_image = action_method(img, self.ui.hybridSlider2.value())
+                processed_image = action_method(cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY), self.ui.hybridSlider2.value())
             else:
                 action = class_type(img) if index < 5 else self.hybrid
                 action_method = getattr(action, action_type)
