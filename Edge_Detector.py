@@ -7,6 +7,29 @@ class EdgeDetector:
         self.gray = cv2.convertScaleAbs(original_img)
 
     def sobel_detector(self):
+        """
+        Compute the gradient of an image using the Sobel operator.
+
+        The Sobel operator is defined as:
+
+            G_x = [1 0 -1]
+                  [2 0 -2]
+                  [1 0 -1]
+
+        and:
+
+            G_y = [1 2 1]
+                  [0 0 0]
+                  [-1 -2 -1]
+
+        The gradient magnitude is computed as the Euclidean norm of the gradient vector
+        (magnitude = sqrt(G_x^2 + G_y^2)). The resulting gradient magnitude image is
+        scaled to fit in the range [0, 255]
+
+        Returns:
+            gradient_magnitude (ndarray): image of gradient magnitude values
+        """
+
         # Define Sobel kernels
         sobel_x = np.array([[-1, 0, 1],
                             [-2, 0, 2],
@@ -23,11 +46,33 @@ class EdgeDetector:
         # Compute gradient magnitude
         gradient_magnitude = np.sqrt(gradient_x ** 2 + gradient_y ** 2)
 
+        # Scale gradient magnitude to fit in range [0, 255]
         gradient_magnitude *= 255.0 / gradient_magnitude.max()
 
         return gradient_magnitude.astype(np.uint8)
 
+
     def roberts_detector(self):
+        """
+        Compute the gradient of an image using the Roberts operator.
+
+        The Roberts operator is defined as:
+
+            G_x = [1 0]
+                  [0 -1]
+
+        and:
+
+            G_y = [0 1]
+                  [-1 0]
+
+        The gradient magnitude is computed as the Euclidean norm of the gradient vector
+        (magnitude = sqrt(G_x^2 + G_y^2)). The resulting gradient magnitude image is
+        scaled to fit in the range [0, 255]
+
+        Returns:
+            gradient_magnitude (ndarray): image of gradient magnitude values
+        """
         kernel_x = np.array([[1, 0], [0, -1]])
         kernel_y = np.array([[0, 1], [-1, 0]])
 
@@ -37,7 +82,24 @@ class EdgeDetector:
 
         return roberts.astype(np.uint8)
 
+
     def canny_detector(self):
+        """
+        Compute the Canny edge detector on the image.
+
+        The Canny edge detector is based on the following steps:
+
+        1. Apply Gaussian blur to reduce noise
+        2. Compute gradient magnitude and direction
+        3. Non-maximum suppression: only keep the points where the gradient magnitude is
+           the largest in a particular direction
+        4. Hysteresis thresholding: keep only the points that have a strong gradient
+           magnitude (above high threshold) and have a neighboring point with a gradient
+           magnitude above the low threshold
+
+        Returns:
+            edge_image (ndarray): image of edge pixels
+        """
         # Step 2: Apply Gaussian blur
         blurred_image = cv2.GaussianBlur(self.gray, (5, 5), 0)
         low_threshold = 5
@@ -84,10 +146,26 @@ class EdgeDetector:
         return edge_image.astype(np.uint8)
 
     def prewitt_detector(self):
+        """
+        Compute the gradient of an image using the Prewitt operator.
+
+        The Prewitt operator is defined as:
+
+            G_x = [(-1, 0, 1), (-1, 0, 1), (-1, 0, 1)]
+                  [(-1, -1, -1), (0, 0, 0), (1, 1, 1)]
+
+        The gradient magnitude is computed as the Euclidean norm of the gradient vector
+        (magnitude = sqrt(G_x^2 + G_y^2)). The resulting gradient magnitude image is
+        scaled to fit in the range [0, 255]
+
+        Returns:
+            gradient_magnitude (ndarray): image of gradient magnitude values
+        """
         kernel_x = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
         kernel_y = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
         prewitt_x = cv2.filter2D(self.gray, -1, kernel_x)
         prewitt_y = cv2.filter2D(self.gray, -1, kernel_y)
         prewitt = np.sqrt(prewitt_x ** 2 + prewitt_y ** 2)
 
+        return prewitt.astype(np.uint8)
         return prewitt.astype(np.uint8)

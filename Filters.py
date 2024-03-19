@@ -44,14 +44,28 @@ class Filter:
         self.filtered_img = data_final
         return self.filtered_img
 
-    def gaussian_filter(self, frequency_response = 255):
+    def gaussian_filter(self, frequency_response=255):
         """
         Apply Gaussian filter to the original image.
+
+        Args:
+            frequency_response (int): The maximum frequency response of the filter.
+                                      Defaults to 255.
+
+        Returns:
+            numpy.ndarray: The filtered image.
         """
+        # The sigma value controls the spread of the Gaussian function.
+        # A larger value means a wider spread.
         sigma = 1
+
+        # Generate a Gaussian kernel
         kernel = self._gaussian_kernel(self.kernel_size, sigma)
+
+        # Scale the kernel by the maximum frequency response
         kernel *= frequency_response / 255
 
+        # Apply the Gaussian filter using cv2.filter2D()
         self.filtered_img = cv2.filter2D(self.original_img, -1, kernel)
 
         return self.filtered_img
@@ -59,7 +73,14 @@ class Filter:
     def average_filter(self):
         """
         Apply average filter to the original image.
+
+        This function applies an average filter to the original image
+        using the specified kernel size.
+
+        Returns:
+            numpy.ndarray: The filtered image.
         """
+        # Create a kernel with a constant value of 1/kernel_size^2
         kernel = np.ones((self.kernel_size, self.kernel_size)) / (self.kernel_size ** 2)
 
         # Apply average filter using cv2.filter2D()
@@ -70,8 +91,23 @@ class Filter:
     def _gaussian_kernel(self, size, sigma):
         """
         Generate a Gaussian kernel.
+
+        This function generates a Gaussian kernel with a size of `size` x `size`
+        and a standard deviation of `sigma`. The kernel is normalized to have
+        a sum of 1.
+
+        Args:
+            size (int): The size of the kernel.
+            sigma (float): The standard deviation of the Gaussian distribution.
+
+        Returns:
+            numpy.ndarray: The Gaussian kernel.
         """
+        # Create a 2D Gaussian kernel using a numpy array
         kernel = np.fromfunction(lambda x, y: (1 / (2 * np.pi * sigma ** 2)) * np.exp(
             -(x - size // 2) ** 2 / (2 * sigma ** 2) - (y - size // 2) ** 2 / (2 * sigma ** 2)), (size, size))
+
+        # Normalize the kernel so that the sum of all elements is 1
         kernel /= np.sum(kernel)
+
         return kernel

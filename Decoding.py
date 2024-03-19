@@ -6,6 +6,12 @@ class Decoding:
         self.gray = cv2.convertScaleAbs(original_image)
 
     def equalize(self):
+        """
+        Calculate the histogram of the original image
+        Calculate the cumulative distribution function (CDF) of the histogram
+        Normalize the CDF to the range [0, 255]
+        Interpolate the values of the CDF for each pixel in the image
+        """
         # Calculate the histogram of the original image
         histogram, _ = np.histogram(self.gray.flatten(), bins=256, range=[0, 256])
 
@@ -19,7 +25,15 @@ class Decoding:
         equalized_image = np.interp(self.gray.flatten(), range(256), cdf_normalized).reshape(self.gray.shape).astype(np.uint8)
         return equalized_image
 
+
     def normalize(self):
+        """
+        Convert the image to floating-point format
+        Determine the minimum and maximum pixel values
+        Normalize the image to the range [0, 1]
+        
+        :return: normalized_image as numpy array of dtype uint8
+        """
         # Convert the image to floating-point format
         image_float = self.gray.astype(np.float32)
 
